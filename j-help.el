@@ -212,9 +212,18 @@ string * int -> (string * string) list"
 (defun j-help-lookup-symbol ( symbol )
   "Lookup symbol in dictionary"
   (interactive "sJ Symbol: ")
-  (let ((url (j-help-symbol-to-doc-url symbol)))
+  (let* ((url (j-help-symbol-to-doc-url symbol))
+	(j-dict-buffer-name "*j-dictionary*")
+	(j-dict-buffer-window (get-buffer-window j-dict-buffer-name)))
     (message "Loading %s ..." url)
-    (browse-url url)))
+    (unless j-dict-buffer-window (split-window))
+    (if (get-buffer "*j-dictionary*")
+	(progn (if j-dict-buffer-window
+		   (switch-to-buffer-other-window j-dict-buffer-name)
+		   (switch-to-buffer j-dict-buffer-name))
+	       (eww url)))
+    (eww url)
+    (rename-buffer "*j-dictionary*")))
 
 ;;;###autoload
 (defun j-help-lookup-symbol-at-point ( point )
